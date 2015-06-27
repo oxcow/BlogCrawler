@@ -1,0 +1,265 @@
+原文链接：http://blog.sina.com.cn/s/blog_ad6af1250102vfl0.html
+		
+			------Java培训、Android培训、iOS培训、.Net培训、期待与您交流！ -------
+
+Set体系概述：
+
+
+Set中的方法其父接口Collection中方法一致。
+
+Set接口取出方式只有一种，迭代器。
+
+Set：
+
+
+|--HashSet：底层数据结构是哈希表，线程是不同步的。无序，高效；
+
+HashSet集合保证元素唯一性：通过元素的hashCode方法，和equals方法完成的。
+
+当元素的hashCode值相同时，才继续判断元素的equals是否为true。
+
+如果为true，那么视为相同元素，丢弃。如果为false，那么在该hash值下顺延一片空间存储。
+
+如果hashCode值不同，那么不判断equals，从而提高对象比较的速度。
+
+也就是说是否为相同元素依赖于hashCode和equals两个方法，这与ArrayList不同，ArrayList中
+
+是否属于同一元素只依赖于equals。
+
+|--TreeSet：对Set集合中的元素的进行指定顺序的排序。同样是线程不同步。
+
+TreeSet底层的数据结构为二叉树，使用二叉树的好处在于当我们向TreeSet中插入元素时，由于其要保持
+
+按照自然顺序排序，因此需要大量的比较，这是非常浪费内存的，而使用二叉树却可以大量的减少这种
+
+比较的次数，从而达到提高效率的作用（扩展：当元素很多时，在对元素进行插入时也不再是由根节点
+开始了，而是由当前元素的中间值开始比较）。
+
+
+
+HashSet：
+
+1.对对象元素中的关键字(对象中的特有数据)，进行哈希算法的运算，并得出一个具体的值，称为哈希值。
+
+2.哈希值就是这个元素在存储空间中的位置，地址，门牌号。例如：我家住在7单元5楼一号，此处的7单元5楼就是hash值，一号是我在此hash值下的位置。如果有一个人家跟我家hash值一样，那么他们也住在7单元5楼，只不过是2号，这就是顺延。
+
+3.如果哈希值出现相同（一般情况下自定义对象时不会有相同的，但是我们可以通过复写hashCode方法来达到hash值一样的效果），再次判断这个关键字对应的对象是否相同。如果对象相同，就不存储（保证元素不重复）。如果对象不同，就存储，在原来对象的哈希值的空间顺延一片存储。
+
+4.该集合内部不可能存储的是对象的实体，实质存储的是hash值，因此称为哈希表。
+
+5.既然哈希表中元素是根据哈希值存储的，为了提高效率，最好保证对象的关键字是唯一的，也就是保证计算得到的hash值是唯一的，这样就可以在调用hashCode阶段得到不同hash值，就不用调用equals方法了，提高效率。
+ArrayList，判断元素是否存在，或者删元素（本质就是查找相同元素时）底层依赖的只是equals方法。
+
+HashSet，判断元素是否存在，或者删除元素（本质就是查找相同元素时），底层依赖的是hashCode方法和equals方法，先由hashCode得到hash值，如果有相同hash值的再调用equals比较是否为相同元素。
+练习代码：
+//Hash表存储自定义对象
+//思路：问题在于相同元素的唯一性，也就是要自定义相等这个规则
+//存入人对象，设定：同名同年龄为同一个人
+package com.helong.hashsetdemo;
+import java.util.*;
+class Person
+{
+private String name;
+private int age;
+Person(String name,int age)
+{
+this.name=name;this.age=age;
+}
+public String getName()
+{
+return name;
+}
+public int getAge()
+{
+return age;
+}
+//复写hashCode方法，否则每个人对象的hash值都是不同的
+public int hashCode()
+{
+
+//思路：该方法返回的hash值应该是由姓名和年龄来决定的，这样才可以保证不同对象的hash值唯一
+return this.name.hashCode()+this.age*33;
+
+//字符串本身就有自己的hash值（常量池中的地址）再加上年龄*33，作为该对象的hash值
+
+//乘以33主要是为了尽量避免出现两个对象名不同，年龄不同，但是一相加之后最后的值相同
+//结果有一个没有被存储的情况发生。
+}
+//复写equals方法，自定义相等规则
+public boolean equals(Object
+obj)//注意别写成了equals(Person p)这是重载不是复写了
+{
+if(!(obj instanceof Person))throw new
+RuntimeException("对象非人对象");
+Person p=(Person)obj;
+return
+this.name.equals(p.getName())this.age==p.getAge();
+}
+}
+class HashSetDemo
+{
+public static void main(String[]
+args)
+{
+HashSet hs = new HashSet();
+hs.add(new Person("helong01",22));
+hs.add(new Person("ldy",22));
+hs.add(new Person("ldy",22));
+hs.add(new Person("ldy",18));
+hs.add(new Person("helong02",22));
+hs.add(new Person("helong02",22));
+
+for(Iterator it =
+hs.iterator();it.hasNext();)
+{
+Person p=(Person)(it.next());
+
+System.out.println("Name:"+p.getName()+",Age:"+p.getAge());
+}
+}
+}
+运行图：
+
+
+
+TreeSet:
+
+用于对Set集合进行元素的指定顺序排序，排序需要依据元素自身具备的比较性。
+
+如果元素不具备比较性，在运行时会发生ClassCastException异常。
+
+所以需要元素实现Comparable接口，复写compareTo方法，强制让元素具备比较性。
+
+依据compareTo方法的返回值，确定元素在TreeSet数据结构中的位置。
+TreeSet方法保证元素唯一性的方式：依赖方法compareTo结果是否为0，如果为0，视为两个对象重复，丢弃。
+
+
+
+注意：
+
+排序时，通常要比较主要条件和次要条件。
+
+在判断时，需要分主要条件和次要条件，当主要条件相同时，再判断次要条件，按照次要条件排序，如果此时次要条件依然相同，那么才确定为同一元素，丢弃。
+
+
+
+TreeSet集合排序有两种方式，Comparable和Comparator区别：
+1：让元素自身具备比较性，需要元素对象实现Comparable接口，复写其compareTo方法。
+2：让集合自身具备比较性，需要定义一个实现了Comparator接口的比较器，并覆盖compare方法，并将该类对象作为实际参数传递给TreeSet集合的构造函数。
+对比：第一种方法虽然也能达到效果，但是其缺点在于需要修改原类的代码，而这是我们不希望看到的，而第二种方法只需要定义一个比较器类，将其传给集合构造函数即可，因此我们通常使用第二种方法也就是比较器的方式来对TreeSet集合排序。
+练习代码：
+
+//两种TreeSet集合排序方式
+
+//1.元素具备可比性
+
+//2.集合自身具备针对此元素的可比性
+
+//存入人对象，希望按照年龄进行排序，且同名同年龄为相同对象
+package
+com.helong.treesetdemo;
+import
+java.util.*;
+
+//元素自身具有可比性
+class
+Person
+{
+private
+String name;
+private int
+age;
+
+Person(String name,int age)
+{
+
+this.name=name;this.age=age;
+}
+public
+String getName()
+{
+return
+name;
+}
+public int
+getAge()
+{
+return
+age;
+}
+
+}
+
+
+//集合自身具有可比性
+class
+MyComparator implements Comparator
+{
+public int
+compare(Object o1,Object o2)
+{
+if(!(o1
+instanceof Person)||!(o2 instanceof Person))
+throw new
+RuntimeException("对象非人对象");
+Person
+p1=(Person)o1,p2=(Person)o2;
+int
+temp=p1.getAge()-p2.getAge();
+
+if(temp==0)
+{
+return
+p1.getName().compareTo(p2.getName());
+}
+return
+temp;
+}
+}
+class
+TreeSetDemo
+{
+public
+static void main(String[] args)
+{
+
+//让元素具备可比性来达到排序的效果
+//TreeSet ts
+= new TreeSet();
+
+//让集合资深具备可比性
+TreeSet ts =
+new TreeSet(new MyComparator());//将比较器作为构造函数的参数
+ts.add(new
+Person("helong",22));
+ts.add(new
+Person("helong",18));
+ts.add(new
+Person("ldy",22));
+ts.add(new
+Person("helong",22));
+ts.add(new
+Person("ldy",18));
+ts.add(new
+Person("abc",18));
+ts.add(new
+Person("abbb",18));
+
+for(Iterator
+it = ts.iterator();it.hasNext();)
+{
+Person
+p=(Person)(it.next());
+
+System.out.println("Name:"+p.getName()+",Age:"+p.getAge());
+}
+}
+}
+运行图：
+
+
+总结：
+今天学习的是Set体系中两个最常用的子类HashSet和TreeSet，分别采用了哈希表和二叉树进行底层的存储。各有其特点，HashSet特点：采用哈希表存储元素，效率高，对于是否为同一元素依赖于hashCode和equals两个方法，这是它特有的，也是哈希表的特点。适合存储一些对顺序无要求的元素时。TreeSet特点：不仅可以存储元素，还会对元素进行排序，这样当我们迭代器取出来时，元素是按照自然顺序排好了的，当然这就需要元素具有可比性或者集合自身具有可比性，也就是实现该集合排序的两种方式：1.元素具有可比性，实现Comparable接口。2.集合具有可比性，定义一个比较器实现Comparator接口。综合看来比较器的形式更加灵活，且不需要更改元素的定义，因此我们通常使用这种形式。
+Set体系区别于List体系的两个点：
+1.无序：这里的无序的意思是存入的顺序与取出的顺序不一定一致。例如：对于HashSet，取出的顺序是根据hash值来取出的，因此不一定同存入一致。对于TreeSet，存入的数据是要通过调用compareTo或者compare排序的，因此也不一定同存入顺序。
+2.不重复：集合中不存在主观上的重复元素，自定义对象是否为相同是由我们定的。例如：对于HashSet，它先通过hashCode得到hash值，如果hash值不同，那么没有重复元素，就存储，如果hash值相同，那么调用equals方法比较元素是否相同，如果返回true，那么表示为同一元素，就不存储，返回false，就在该hash值的空间下顺延出一片空间存储元素。对于TreeSet：如果compareTo或者compare返回0，那么表示为同一元素，就不存储，如果返回非0，则表示不是相同元素，就存储。

@@ -1,0 +1,321 @@
+原文链接：http://blog.sina.com.cn/s/blog_ad6af1250102vf4u.html
+		
+			这两天学习java
+API部分，主要就是String，StringBuffer，StringBuilder这三个类。简单写一些我学这些部分的一些感想。
+String
+
+字符串是我们日常中最常用的一种数据类型，java肯定不会放过把它封装成对象的。出于面向对象的思想考虑，这样也确实是更方便我们程序员对字符串进行操作。java中字符串是常量，也就是说赋值一次就不能再改变其内容了。对于这个问题我个人觉得是因为开发java语言的大神觉得对于字符串来说，更多的操作是获取，查询等只是访问，而不是修改其内容的操作，那么对于这种情况来说，将字符串存放到常量池种无疑是效率更高的一种方式。例如String
+str1="123";String str2="123";这时str1和str2指向同一个字符串对象。
+对于String对象的操作通常分为以下几种(每一对双引号中间的都是字符串对象)：
+1.获取
+a.int length();该方法返回当前字符串对象的长度。
+通常用于遍历字符串等对字符串进行循环操作的语句中
+b.char charAt(int index);获取指定位置的单个字符。
+通常用于对字符串中每个字符挨个进行操作时取出对应位置的字符
+c.获取指定字符/字符串在字符串中第一次/最后一次出现的位置，不存在返回-1。
+1.indexOf(char ch);
+2.indexOf(char ch,int fromIndex);从位置fromIndex开始查找
+3.indexOf(String str);
+4.indexOf(String str,int fromIndex);
+通常用于字符串的匹配，例如一个串中包含另一个串，可以操作文件名判断其文件类型indexOf(".java")
+d.获取当前字符串对象的子串。
+1.String substring(int start);
+2.String substring(int start,int end);
+通常用于对字符串进行取其所有子串的操作
+2.判断
+a.boolean contains(String str);该方法用于判断当前字符串中是否包含str
+通常用于文件检测，例如非法字符，敏感字的查询，关键字搜索等。
+如果我们只是需要判断一个字符串是否包含另一个使用contains，但是如果还想要在字符串中的位置，那么就需要使用indexOf方法了。
+b.boolean equals(String
+str);该方法用于判断两个字符串是否相等，这个方法复写了Object中的equals方法，重定义了内容，比较的是两个字符串的值，而不是引用。
+通常用于字符串的比较，例如用户名密码的判断等等。
+c.boolean equalsIgnoreCase(String
+str);功能与equals相似，只是这个方法忽略大小写。
+通常用于字符串的比较，且忽略大小写的地方，例如邮箱验证等不是大小写敏感的地方。
+d.boolean startsWith(String str);该方法用于判断当前字符串是否以str开头。
+通常用于判断文件的类型，例如我们写java文件时，跟Array有关的文件名都以Array开头。
+e.boolean endsWith(String str);该方法用于判断当前字符串是否以str结尾。
+通常用于判断文件的类型，通过判断文件名的后缀名，例如"demo.java".endsWith(".java");
+3.转换
+a.通过构造函数将字符数组和字节数组转换成字符串。
+b.static String copyValueOf(char[]);
+c.static String copyValueOf(char[],int offset,int
+count);将数组中的全部/部分内容转成字符串。
+d.static String
+valueOf(****);将各种类型（数组，基本数据类型,Object）转为字符串。
+e.String toLowerCase();将当前字符串转为全小写。
+f.String toUpperCase();将当前字符串转为全大写。
+g.char[] toCharArray();将当前字符串转换成数组。
+h.byte[] getBytes();将当前字符串转为字节数组。
+i.String[] split(String str);将字符串按照str进行分割，返回字符串数组。
+j.String replace(old,new);将字符串中的old用new替换（字符或者字符串）。
+k.String concat(String str);将str添加到字符串的结尾。
+l.String trim();去除字符串两端的连续空格。
+m.compareTo(String
+str);按照字典序对两个字符串进行比较，返回0表示相等，返回正数表示当前字符串大，返回负数表示参数字符串大。
+转换的方法通常用于对字符串进行某些更细致的操作时，这时使用数组可能更方便，且由于字符串是不可变的，因此通常我们转为数组，对其操作完再转回成字符串。valueOf这个方法主要用于将各式各样的类型转为字符串方便打印输出等。replace可以用于文件编辑工具的查找替换功能。trim主要用于在用户输入了用户名时去除两边的空格再判断用户名是否对错（前提是默认用户名不包括空格），这样更人性化，否则很可能用户不明白为什么他的用户名明明看起来是对的，但是却是错的。compareTo用于字符串的大小比较，这很重要，因为在很多地方，例如欧美国家等，很多东西的顺序都是按照字典序排列的，这个方法在这里就非常实用。
+
+总结（心得）：String是一个功能非常齐全，实用非常强的一个类，如果我们不会对字符串进行很多的修改操作，那么建议使用String类，由于常量池的存在，使得这个类在不频繁创建对象的时候效率比较高，也能完成绝大部分的功能需求。
+练习代码：
+
+class Test
+{
+public static void main(String[] args)
+{
+String str="  helong
+ 刘冬园 哈哈 ldy
+ ";
+System.out.println("("+str+")");
+System.out.println("("+trim(str)+")");
+System.out.println("("+reverse(str)+")");
+
+try
+{
+System.out.println("("+reverse("0123456789",2,6)+")");
+}
+catch (Exception e)
+{
+e.printStackTrace();
+}
+
+System.out.println("lonhelonghelonghelonglon");
+System.out.println("lon");
+
+System.out.println(count("lonhelonghelonghelonglonlll","l"));
+
+
+System.out.println("helongisagoodboy!"+"\n"+"ssshelongis"+"\n"+"最长共同子串："+getMaxSub("helongisagoodboy!","ssshelongis"));
+
+System.out.println("helongisagoodboy!"+"\n"+"helongishahaha"+"\n"+"最长共同子串："+getMaxSub("helongisagoodboy!","helongishahaha"));
+
+System.out.println("helongisagoodboy!"+"\n"+"vvvvvvvvvv"+"\n"+"最长共同子串："+getMaxSub("helongisagoodboy!","vvvvvvvvvv"));
+
+System.out.println("helongisagoodboy!"+"\n"+"hvvvvvvvvv"+"\n"+"最长共同子串："+getMaxSub("helongisagoodboy!","hvvvvvvvvv"));
+
+System.out.println("helongisagoodboy!"+"\n"+"vvvvgisagoodyyyy"+"\n"+"最长共同子串："+getMaxSub("helongisagoodboy!","vvvvgisagoodyyyy"));
+}
+
+//思路：获取到字符串从左向右数第一个非空格的字符下标
+//获取到字符串从后到左第一个非空格的字符的下标，用这两个值获取原字符串的子串
+private static String trim(String str)
+{
+int left=0,right=0;
+for(int i=0;i
+{
+if(str.charAt(i)!=' ')
+{
+left=i;
+break;
+}
+}
+for(int i=str.length()-1;i=0;i--)
+{
+if(str.charAt(i)!=' ')
+{
+right=i;
+break;
+}
+}
+if(leftright)return "";
+return str.substring(left,right+1);
+}
+
+//将字符串反转存入数组，返回数组转成字符串
+private static String reverse(String str)
+{
+char[] arr=new char[str.length()];
+for(int i=0;i
+{
+arr[i]=str.charAt(str.length()-1-i);
+}
+return String.copyValueOf(arr);
+}
+private static String reverse(String str,int left,int
+right)throws Exception
+{
+
+if(left0||leftstr.length()-1||right0||rightstr.length()-1||leftright)
+throw new Exception("参数错误！");
+char[] arr=new char[str.length()];
+for(int i=0;i
+arr[i]=str.charAt(i);
+for(int i=left,j=0;i=right;i++,j++)
+{
+arr[i]=str.charAt(right-j);
+}
+for(int i=right+1;i
+arr[i]=str.charAt(i);
+return String.copyValueOf(arr);
+}
+
+//获取一个串出现在另一个串中的次数
+//使用indexOf解决上题
+private static int count(String str,String sub)
+{
+if(sub.length()str.length())return 0;
+String temp=str;
+int count=0;
+for(int i=0;i
+{
+int x=temp.indexOf(sub);
+if(x!=-1)count++;
+else break;
+i=x+1;
+temp=temp.substring(i);
+}
+return count;
+}
+
+
+//获取两个字符串中最大相同的子串
+//思路：
+//设置两个指针对着头和尾，例如头为0，尾为10
+//每次将尾那边的值减一，0和9，搜索这个子串在长串中是否存在，存在返回
+//不存在，将头尾往后移一位变成1和10，再比较，再往后移。。知道尾出界为止
+//如果还没找到，再将尾减一，再循环比较，后移，知道头小于尾结束。
+private static String getMaxSub(String max,String min)
+{
+for(int left=0,right=min.length();left
+{
+for(int i=0;i
+if(max.contains(min.substring(left+i,right+i)))return
+min.substring(left+i,right+i);
+}
+return "无相同子串";
+}
+}
+
+
+StringBuffer
+
+这是一个容器类，线程安全的，拥有容器的一般功能，且能操作多种数据类型，更实用的是它的长度是可变的，也就是动态分配的。String只适合那些不需要大量修改字符串的地方，否则会大量的创建String对象，占用大量内存，效率极低，于是java提供了StringBuffer类来满足这些场合，假如我们写一个文件编辑器之类的软件，那么该类就会被大量的使用。
+StringBuffer常用方法：
+a.存储
+1.StringBuffer
+append(****);该方法用于在字符串结尾添加数据。之所以返回值为StringBuffer我个人认为更多的是为了使得这个方法可以使用链式编程，例如sb.append(123).append('a').append("qwe");而为了将返回值赋给一个StringBuffer引用我觉得不是主要的。
+通常用于从某个数据源获取数据，然后通过链式编程将数据全部添加到StringBuffer中。
+2.StringBuffer insert(index,****);该方法用于在字符串index位置插入数据。
+通常用于文本编辑器等的插入功能时，在指定地方插入指定的字符串。
+b.删除
+1.StringBuffer delete(start,end);该方法删除start到end-1的所有字符。
+通常用于删除部分字符，也可以用于清空缓冲区，例如:sb.delete(0,sb.length());
+2.StringBuffer
+deleteCharAt(index);该方法删除指定位置的一个字符。本质上这个方法也是内部也是调用的delete，例如deleteCharAt(index)内部调用delete(index,index+1);
+通常用于删除指定位置的字符，可以用于密文的解密，比如在原文中每隔4个字符加一个a，使用这个方法去除这些a还原成原文。
+c.获取
+1.int length();获取长度。
+2.char charAt(int index);获取指定位置的字符。
+3.int
+indexOf(****);获取StringBuffer中字符串的首次出现位置，-1表示不存在，可以设置查找位置
+4.int lastIndexOf(****);同上，不过获取的是最后一次出现的位置。
+5.String substring(start);获取StringBuffer从start开始到最后的子串。
+6.String
+substring(start,end);获取StringBuffer从start到end-1的子串。
+通常用于对字符串进行检索等操作，例如查找某个关键字，敏感词等，获取长度一般用于循环遍历字符串中的循环判断条件。
+d.修改
+1.StringBuffer
+replace(start,end,str);将start到end-1的字符串使用str替换，返回StringBuffer的原理同append，为了使用链式编程。
+通常用于文本编辑工具的替换功能，同样可以用于密文的生成和还原。
+2.void
+setCharAt(index,ch);使用ch替换原串中index位置的字符。该方法特殊在其返回值类型为void
+替换指定位置的单个字符时使用该方法。
+e.反转
+1.StringBuffer reverse();将字符串反转，例如："123"--"321"。
+用于反转一个字符串，通常用于大部分的文本编辑功能。
+总结（心得）：
+
+我个人觉得StringBuffer类的使用的范围要更广于String，因为在绝大部分地方我们都需要对字符串进行修改等会改变其内容的操作，而StringBuffer的可变长度很好的应对这个问题，而不用像String类一样，频繁的创建对象，消耗内存。
+练习代码：
+
+class StringTest
+{
+public static void main(String[] args)
+{
+method_save();
+method_get();
+method_del();
+method_upd();
+}
+//获取
+private static void method_get()
+{
+StringBuffer sb = new
+StringBuffer("123456785747434577777345");
+sop("sb长度："+sb.length());
+sb.append(23.23);
+sop("sb长度："+sb.length());
+sop("位置3的字符："+sb.charAt(3));
+sop("sb中345的位置："+sb.indexOf("345"));
+sop("sb中345的位置："+sb.indexOf("345",5));
+sop("sb中345的位置："+sb.lastIndexOf("345"));
+sop("sb子串3-12："+sb.substring(3,12));
+}
+//存储
+private static void method_save()
+{
+StringBuffer sb=new StringBuffer();
+sb.append(12).append('a')
+.append("\thelong\t\").append(12.23);
+sop(sb.toString());
+
+sb.insert(3,"ldy").insert(0,true);
+sop(sb.toString());
+//实际使用：
+StringBuffer sb1=new StringBuffer();
+sb1.append("Array").append("Demo").append(".java");
+sop(sb1.toString());
+}
+//删除
+private static void method_del()
+{
+StringBuffer sb=new StringBuffer("helong love ldy");
+sop(sb);
+sop(sb.delete(1,5));
+sop(sb.deleteCharAt(8));
+sop("("+sb.delete(0,sb.length())+")");//清空缓冲区
+}
+//修改
+private static void method_upd()
+{
+StringBuffer sb = new StringBuffer("Arraydemo.javv
+Arraydemo.javv Arraydemo.javv
+Arraydemo.javv");
+sop(sb);
+//将字符串中所有的javv改为java，对大量文本进行修改
+for(int i=0;i
+{
+int index=sb.indexOf("javv",i);
+if(index!=-1)
+{
+sb.replace(index,index+"javv".length(),"java");
+i+="javv".length()-1;
+}
+}
+sop(sb);
+//sop("sb4位置修改为l："+sb.setCharAt(4,'l'));
+//上语句报错，因为setCharAt方法返回值是void类型
+sb.setCharAt(4,'l');
+sop("sb4位置修改为l："+sb);
+}
+private static void sop(Object obj)
+{
+System.out.println(obj);
+}
+}
+
+
+
+StringBuilder
+
+1.5以后出现的新类，该类作为StringBuffer的一个简易替代类，拥有和StringBuffer一模一样的功能方法，且由于该类不是线程安全的，因此不用每次都判断锁，因此效率更高，如果直接使用只适用于单线程。如果想在多线程中使用，可以利用Lock来手动同步，因此建议使用StringBuilder替代StringBuffer类。
+
+
+总结：
+1.在没有大量修改字符串的场合使用Stirng类。
+
+2.在有修改字符串的场合使用StringBuffer类，但是在JDK1.5之后推出了StringBuilder类，该类效率更高，且安全性可以通过程序员手动解决，因此推荐使用StringBuilder类。
+java的升级目的：
+1.提高效率。
+2.提高安全性。
+3.减少书写。
+JDK1.5推出的StringBuilder就是为了提高对字符串操作的效率。

@@ -1,0 +1,315 @@
+原文链接：http://blog.sina.com.cn/s/blog_ad6af1250102vf91.html
+		
+			//手写实现MyArrayList,MyLinkedList仿ArrayList，LinkedList功能
+package com.helong.mylist;
+//==============================================
+//ArrayList
+//实现它的容量自动扩充
+//增删改查长度
+class MyArrayList
+{
+private Object[] value=null;
+private int size=0;
+MyArrayList()
+{
+value=new Object[10];
+}
+//增加
+public boolean add(Object obj)
+{
+if(size==value.length)
+expansion();
+value[size++]=obj;
+return true;
+}
+//删除
+public boolean remove(int index)
+{
+if(index0||index=size)
+return false;
+Object[] temp=new
+Object[size-1];//使用到数组长度的地方要由size来替代，因为size才是真实的元素个数
+for(int i=0,j=0;i
+{
+if(i!=index)
+{
+temp[j++]=value[i];
+}
+}
+value=temp;
+size--;
+return true;
+}
+//内部调用remove(int index)
+public boolean remove(Object obj)
+{
+for(int i=0;i
+{
+if(value[i].equals(obj))
+{
+remove(i);
+return true;
+}
+}
+return false;
+}
+//修改
+public boolean set(int index,Object obj)
+{
+if(index0||index=size)
+return false;
+value[index]=obj;
+return true;
+}
+//获取
+public Object get(int index)
+{
+if(index0||index=size)
+return null;
+return value[index];
+}
+//长度
+public int length()
+{
+return size;
+}
+//复写toString方法，使得该类被打印时按照自定义方式输出
+public String toString()
+{
+String str="【";
+for(int i=0;i
+{
+if(i!=size-1)
+str+=(value[i]+",");
+else
+str+=value[i];
+}
+str+="】";
+return str;
+}
+private boolean expansion()
+{
+Object[] temp=new Object[value.length+5];
+temp=value.clone();
+//注意：clone只对一维数组起作用，而不能用于二维数组，
+//因为java没有二维数组的概念，而只有数组的数组，二维
+//数组存储的是几个一维数组的引用，而使用clone也只是
+//拷贝了这几个引用，说白了还是原来那几个一维数组对象。
+//如果想用于二维数组，那么就遍历其中的一维数组，挨个
+//拷贝一维数组到目标二维数组中的一维数组下。
+value=temp;
+return true;
+}
+}
+
+//==============================================
+//LinkedList
+//节点问题
+//MyLinkedList内部有一个节点成员
+//增删改查长度
+class MyLinkedList
+{
+private MyNode head=null;
+private MyNode tail=null;
+//增加
+public void add(Object obj)
+{
+if(head==null)
+{
+head=tail=new MyNode(null,obj);
+}
+else
+{
+MyNode temp=new MyNode(null,obj);
+tail.setNext(temp);
+tail=temp;
+}
+}
+public void addFirst(Object obj)
+{
+MyNode temp=new MyNode(head,obj);
+head=temp;
+}
+public void addLast(Object obj)
+{
+add(obj);
+}
+//删除并返回删除的元素
+public Object removeFirst()
+{
+if(head==null)return null;
+Object temp=head.getObj();
+head=head.getNext();
+return temp;
+}
+public Object removeLast()
+{
+if(tail==null)return null;
+Object temp=tail.getObj();
+MyNode node =head;
+while(node.getNext()!=tail)//查询到倒数第二个节点的位置
+{
+node=node.getNext();
+}
+tail=node;
+tail.setNext(null);//将该节点设为尾节点
+return temp;
+}
+//清空链表
+public void clear()
+{
+while(head!=null)
+{
+MyNode temp=head;
+head=head.getNext();
+temp.setNext(null);
+}
+tail=head;
+}
+//获取元素但不删除
+public Object getFirst()
+{
+return head==null?null:head.getObj();
+}
+public Object getLast()
+{
+return tail==null?null:tail.getObj();
+}
+//修改元素
+public Object setFirst(Object obj)
+{
+if(head!=null)
+head.setObj(obj);
+return head==null?null:obj;
+}
+public Object setLast(Object obj)
+{
+if(tail!=null)
+tail.setObj(obj);
+return tail==null?null:obj;
+}
+//复写了Object的toString方法，按照自定义方式打印输出
+public String toString()
+{
+String str="【";
+MyNode temp=head;
+while(temp!=null)
+{
+if(temp!=tail)
+str+=(temp.getObj()+",");
+else
+str+=temp.getObj();
+temp=temp.getNext();
+}
+str+="】";
+return str;
+}
+}
+class MyNode
+{
+private MyNode next=null;
+private Object obj=null;
+MyNode(MyNode next,Object obj)
+{
+this.next=next;
+this.obj=obj;
+}
+public Object getObj()
+{
+return obj;
+}
+public MyNode getNext()
+{
+return next;
+}
+public void setObj(Object obj)
+{
+this.obj=obj;
+}
+public void setNext(MyNode next)
+{
+this.next=next;
+}
+}
+
+
+//==============================================
+class MyList
+{
+public static void main(String[] args)
+{
+//MyArrayList测试
+//增加
+printLine();
+sop("MyArrayList方法测试：");
+MyArrayList mal=new MyArrayList();
+mal.add(123);
+mal.add("234");
+mal.add(23.23);
+mal.add("345");
+sop(mal.length());
+sop(mal);
+//删除时，如果传入int，那默认是调用remove(int index)而不是remove(Object
+obj)
+mal.remove(23.23);
+sop(mal.length());
+sop(mal);
+mal.remove("345");
+sop(mal.length());
+sop(mal);
+//按照索引位置修改元素
+mal.set(0,"修改这里");
+sop(mal);
+//获取元素
+sop("索引为0的元素："+mal.get(0));
+sop("索引为1的元素："+mal.get(1));
+printLine();
+
+//============================================
+//MyLinkedList测试
+//增加
+sop("MyLinkedList方法测试：");
+MyLinkedList mll=new MyLinkedList();
+mll.add("123");
+mll.add(23.45);
+mll.add(true);
+sop(mll);
+mll.addFirst("start");
+mll.addLast("end");
+sop(mll);
+//删除头结点，尾节点
+sop("删除元素："+mll.removeFirst());
+sop(mll);
+sop("删除元素："+mll.removeLast());
+sop(mll);
+//获取元素
+sop("头元素："+mll.getFirst());
+sop("尾元素："+mll.getLast());
+//清空链表
+sop("清空链表");
+mll.clear();
+sop(mll);
+//当链表为空时，再取其头尾结点，此处定义成不会报异常会返回null
+sop("头元素："+mll.getFirst());
+sop("尾元素："+mll.getLast());
+//修改头尾结点值，注意此时链表并无数据，因此返回null
+sop("修改后头元素："+mll.setFirst("head"));
+sop("修改后尾元素："+mll.setLast("tail"));
+
+mll.add("ldy001");mll.add("ldy002");mll.add("ldy003");mll.add("ldy004");mll.add("ldy005");
+sop(mll);
+sop("修改后头元素："+mll.setFirst("head"));
+sop("修改后尾元素："+mll.setLast("tail"));
+sop(mll);
+}
+private static void sop(Object obj)
+{
+System.out.println(obj);
+}
+private static void printLine()
+{
+sop("============================================");
+}
+}
+
+运行图

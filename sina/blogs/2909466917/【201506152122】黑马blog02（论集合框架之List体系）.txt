@@ -1,0 +1,246 @@
+原文链接：http://blog.sina.com.cn/s/blog_ad6af1250102vf82.html
+		
+			红色字体为个人心得及总结，请批评指教。
+这两天学的是集合框架的前半部分，也就是List部分，学习的时间不是很固定，也是比较苦恼啊。。。。
+集合框架：
+
+它的出现主要是为了解决一类问题，那就是当我们要操作一堆对象时，这时我们需要一个像数组类似的东西，但是我们又不满足于数组，主要原因有两个：1.数组的长度是固定的。2.一个数组存储一种数据类型。因此出现了集合框架，这种类型存储对象时可以存储任意类型的对象，且长度可变，比数组要灵活，当然了数组也有它的优势，那就是集合框架是不能存放基本数据类型的。
+说到集合框架，不得不提我们使用率最高的两个子体系List，Set，这两天学的就是List部分。
+
+有的人要说了为什么都是存储数据要这么多类呢，其实它们最主要的区别在于底层的存储方式，也就是数据结构的不同，这使得它们都有自己适合的领域，例如ArrayList使用数据结构存储，因此它的查询速度非常快，使用下标，但是它的缺点就是插入删除速度慢，因为每次删除插入都要大量移动数组中的数据，数据越多，这个缺点就越明显，相反LinkedList采用链表结构，因此它插入删除快，但是查询比较慢，一样的也是数据越多，查询速度越慢。
+List：
+
+该体系下三个我们使用最频繁的子类ArrayList，LinkedList，Vector，下面主要详细介绍这三个类，以及其优缺点等等。
+ArrayList：
+
+这个类大家应该很熟悉，即便没有学到集合框架也应该很常见，该类在底层采用的是数组结构存放数据，因此它的优点就是查询快，利用下标直接获取元素，但是插入删除慢，因为要移动大量数据，因此适用于那些主要是查询的地方，而不适用于那些大量插入删除的地方。
+主要方法：
+1.增加 add，addAll
+向集合中的末尾添加一个元素或者多个元素
+  
+ 2.删除
+remove，removeAll，clear，retainAll（求交集）
+删除一个元素，多个元素，清空结合，以及求两个集合的交集
+  
+ 3.转换 toArray
+将集合转为数组类型
+  
+ 4.获取 iterator，size
+获取集合的迭代器，集合的长度
+5.修改set
+使用参数的元素代替指定位置的元素
+集合的基本方法增删改查。
+这里涉及到了迭代器，简单介绍下：
+迭代器是一种获取元素的方式，在这里的表现是一个接口Iterator，该接口通过iterator方法获取，通过该接口的hasNext,next,remove方法，我们可以操作元素。那么如何在ArrayList类中使用呢？答案是内部类，java将其设计为内部类实现方式，因为对于获取元素这个功能来说简单的一个方法是不够的，需要多个方法配合使用，例如检测是否有元素方法，获取元素方法等，因此java将其抽取成Iterator接口来使用，ArrayList内部类实现了该接口，复写三个方法。如果我们采取一个方法搞定的方式的话，会违反编程的职责单一性原则，就是说该方法的职责过多，因此使用内部类解决最好不多了，之所以使用内部类是因为该类需要访问外部类的私有成员，因此使用内部类最合适，且在逻辑上也很符合，本身获取这个功能就是ArrayList最清楚，应该是ArrayList的一部分。
+说道迭代器，介绍一下遍历List的几个方式：
+1.使用迭代器。
+2.使用列表迭代器。
+3.使用get方法。
+4.使用枚举，这个方式是Vector特有的。
+以下是ArrayList的练习代码：
+
+package com.helong.collectiondemo;
+
+import java.util.*;
+class Person
+{
+private String name=null;
+Person(String name){this.name=name;}
+}
+class CollectionDemo
+{
+public static void main(String[] args)
+{
+ArrayList al1 = new ArrayList();
+al1.add("123");
+al1.add("何龙");
+al1.add(23.23);
+al1.add(true);
+al1.add(new Person("LDY"));
+
+sop(al1.size());
+sop(al1);
+
+//判断
+sop("al1是否包含23.23："+al1.contains(23.23));
+ArrayList al2 = new ArrayList();
+al2.add(true);
+al2.add(23.23);
+al2.add("123");
+sop("all是否包含23.23,true,字符串123："+al1.containsAll(al2));
+sop("al1字符串是否为空："+al1.isEmpty());
+sop("al1字符串是否与al2相等："+al1.equals(al2));
+ArrayList al3=new ArrayList();
+ArrayList al4=new ArrayList();Person p1=new
+Person("aaa");
+al3.add(1);al3.add(2);al3.add(p1);
+al4.add(1);al4.add(2);al4.add(p1);
+sop("al3字符串是否与al4相等："+al3.equals(al4));
+
+//删除
+al1.remove("123");
+sop("al1中删除字符串123："+al1);
+al1.removeAll(al2);
+sop("al1中删除al2的部分："+al1);
+al2.add("何龙");
+sop("al1："+al1);
+sop("al2："+al2);
+al1.retainAll(al2);
+sop("取al1和al2的交集："+al1);
+
+//迭代器
+
+//迭代器是一个类，也就是说iterator方法返回这个类的对象，而该类是一个内部类，在ArrayList内部实现的，
+//实现了Iterator接口，拥有next,hasNext,remove方法，用于处理获取的功能。
+sop("使用迭代器取出al2中的数据：");
+for(Iterator it = al2.iterator();it.hasNext();)
+{
+sop(it.next());
+}
+
+//List体系特有的方法，由于该体系是有序的，可以重复的，因此
+//它的特有方法有一个共同点：参数都有下标值。
+al2.add(3,"muhaha");
+sop(al2);
+al2.remove(1);
+sop(al2);
+al2.set(0,'b');
+sop(al2);
+sop(al2.indexOf('b'));
+sop(al2.get(3));
+for(ListIterator lit =
+al2.listIterator();lit.hasNext();)
+{
+sop(lit.next());
+}
+
+//List体系特有的迭代器：ListIterator，该迭代器是Iterator的子类接口，
+//拥有更丰富的方法，用于对遍历中对元素进行操作。
+
+//对集合进行遍历，如果遇到java3，则添加一个java33，如果遇到java4则将java4改成java44,
+Person pp=new Person("helong");
+ArrayList al5=new
+ArrayList();al5.add("java1");al5.add("java2");al5.add("java3");al5.add("java4");al5.add(pp);
+sop(al5);
+ListIterator lit = al5.listIterator();
+for(;lit.hasNext();)
+{
+Object obj=lit.next();
+
+if(obj.equals("java3"))lit.add("java33");//列表迭代器的add是将元素插入到当前元素的后面
+else
+if(obj.equals("java4"))lit.set("java44");//列表迭代器的set用传入的参数代替当前元素
+else
+if(obj.equals(pp))lit.set("000");//equals比较对象时比较的仍是地址
+}
+sop(al5);
+sop(lit.hasNext());
+sop(lit.hasPrevious());
+while(lit.hasPrevious())
+{
+sop(lit.previous());
+}
+
+}
+private static void sop(Object obj)
+{
+System.out.println(obj);
+}
+}
+
+
+
+
+Vector:
+
+这个类现在应该不是很常见了，它底层采取的也是数组结构，而且没有错，它就是基本和ArrayList一样的功能，只有一个枚举的用法比较特殊，稍后介绍。该类的出现时JDK1.0，当时还没有集合框架，因此当时所谓的集合就只有这一种，直到JDK1.2后出现了集合框架，该类被改造成为了框架的一员。但这种改变只是为了以前的老程序考虑，现在已经不推荐使用该类了，因为它是线程同步的，这使得它不管是查询还是插入删除速度都比较慢，而ArrayList是不同步的，效率比较高（我猜想出现ArrayList就是java升级的三大目的之一：提升效率）。但是我们有必要了解一下这位老前辈。
+它的方法跟ArrayList并没什么两样，但是它又自己特有的东西，那就是枚举方式遍历集合。
+
+elements();方法，返回一个Enumeration子对象，该接口有两个方法：hasMoreElements,nextElement,使用这两个方法可以对集合进行遍历。这让我们不由的想起来迭代器的两个方法hasNext,next，我们发现迭代器的方法命名更短，更利于书写和阅读，因此推荐使用迭代器，而不是枚举。
+
+所有带element的方法都是它特有的老方法，这些方法由于名字过长，已经被替代了，这也是java升级的另一个目的：简化书写。
+总之该类已经被ArrayList取代了，但是我们仍然能够了解该类的功能，特点等。
+下面是练习代码：
+
+//测试Vector的枚举方式取到元素
+//这种取元素的方式是Vector特有的，与迭代器的功能是重复的，由于枚举的名字以及其方法的名字过长，
+//已被迭代器取代
+Vector v = new Vector();
+v.add("123");
+v.add("234");
+v.add("345");
+for(Enumeration e = v.elements();e.hasMoreElements();)
+{
+sop(e.nextElement());
+}
+
+
+
+LinkedList：
+
+这个类是三个类中特别的一个，它的存储方式也就是数据结构不用于前两个，它在底层是采用链表方式存储的，因为大学学过，因此我对链表比较了解。所谓链表就是一个头结点+N个节点+一个尾节点组成的。每个节点的内容是自己本身的数据+方法+下一个节点的引用，如果是尾节点那么该引用就为null。因此我们可想而知，如果我们要在一个链表中插入或者删除是非常简单的，例如A-B-C，我们要删除B，那么我们只需让A中的引用指向C即可，而B就脱离了这个链表，我们再释放它，速度非常快。当然也有缺点，那就是查询速度慢，因为不管是查询哪个元素，都要从头结点或者尾节点一个一个的找下去，当元素很多时，速度非常慢。
+特有方法：
+
+addFirst,addLast,getFitst,getLast（获得元素，但不删除）,removeFirst,removeLast（获得元素，并且删除它）；之所以有这些方法，
+是因为对于链表，取头尾很简单；
+
+注意：由于上述方法在链表为空时使用会报异常NoSuchElementException，因此不推荐使用；
+JDK1.6后出现了替代方法：
+addFirst,addLast-----offerFirst,offerLast
+getFirst,getLast------peekFirst,peekLast
+removeFirst,removeLast------pollFitst,pollLast
+推荐使用新方法，这些方法会链表为空时使用会返回null而不是报异常；
+下面是练习代码：
+
+class Person
+{
+private String name=null;
+Person(String name){this.name=name;}
+}
+class CollectionDemo
+{
+public static void main(String[] args)
+{
+
+
+LinkedList ll = new LinkedList();
+ll.add("add");
+ll.addFirst("addFirst");
+ll.offerFirst("offerFirst");
+ll.addLast("addLast");
+ll.offerLast("offerLast");
+sop(ll);
+sop(ll.getFirst());
+sop(ll.peekFirst());
+sop(ll.getLast());
+sop(ll.peekLast());
+sop(ll.size());
+ll.removeFirst();
+sop(ll+"：长度："+ll.size());
+ll.removeLast();
+sop(ll+"：长度："+ll.size());
+ll.pollFirst();
+sop(ll+"：长度："+ll.size());
+ll.pollLast();
+sop(ll+"：长度："+ll.size());
+//ll.removeLast();
+//ll.removeLast();
+//ll.removeLast();报异常;NoSuchElementException
+ll.pollLast();
+ll.pollLast();
+ll.pollLast();//不会报错，只是返回null，使用返回值前判断就可以了，因此推荐使用这个方法
+}
+private static void sop(Object obj)
+{
+System.out.println(obj);
+}
+}
+
+总结：
+这两天学习了集合框架的一半，感觉到了集合框架的功能，也体会了它的用法，总的说来能满足大部分该类的要求。使用ArrayList处理查询多，插入删除少的情况，反之使用LinkedList。相比于数组它们最大优势在于可变长度和能存储任意类型。在这里说一下这两个优势在java中的具体实现：
+1.可变长度
+ArrayList和Vector：这两个都是数组结构存储的，初始都是new了一个10个长度的数组，当需要的长度不够时，它们采取的策略是new一个更大的数组，现将当前数组的元素copy进去，然后再将新的元素插入数组末尾。不同的是ArrayList每次增加50%的长度，而Vector是100%。从这看出另一个使用ArrayList的原因：它在保持可变长度的情况下比Vector要节省内存空间。
+LinkedList：由于它采用的是链表结构，因此不存在可变长度的问题，它本身就不是一个固定长度的结构，每次添加时new一个节点连接进链表末尾就可以了。
+2.任意数据类型
+可能有的同学不太理解为什么集合能够存储任意类型的数据，在这里我们首先要明白，在集合中存放的肯定不可能是对象实体，如果是那样的话集合的效率，占用内存等都是非常大的问题，其实它内部存放的是对象的地址，我们知道不管是什么类型的对象，它的地址都是一样的类型，因此集合可以存放任意类型的对象，更严谨的说法是它能够存放任意类型的对象的地址，就好像集合内部有一张可变长度的表，表里存放的都是那些对象的地址，我们访问元素时，通过表里的地址找到对象就可以了。
+以上就是我对这部分集合框架的理解。
