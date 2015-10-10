@@ -61,7 +61,7 @@ _blog_list = []
 
 
 def get_blog_list(html):
-    _reg = r'title="(\S*)" target="_blank" href="(\S*)".*?class="atc\_tm SG\_txtc">(\d{4,}-\d\d-\d\d \d\d:\d\d)'
+    _reg = r'title="(\S*)" target="_blank" href="(\S*)">(\S*)</a>.*?class="atc\_tm SG\_txtc">(\d{4,}-\d\d-\d\d \d\d:\d\d)'
 
     blog_list = re.findall(_reg, html, re.I | re.S)
 
@@ -158,9 +158,13 @@ if __name__ == '__main__':
 
     _start = time.time()
 
-    for (_title, _url, _date) in _blog_list:
+    for (_title, _url, _post, _date) in _blog_list:
 
         try:
+
+            if _title == '':
+                _title = _post
+
             _title = saxutils.unescape(_title, {'&nbsp;': ' ', '&#039;': "'"})
 
             _title = re.sub(r'[/\\:"*?<>|]', '', _title)
