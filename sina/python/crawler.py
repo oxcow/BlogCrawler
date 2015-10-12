@@ -18,16 +18,18 @@ config = {
     'blog_site': 'http://blog.sina.com.cn'
 }
 
+# 日志级别格式设置
 logger.basicConfig(
     level=logger.INFO,
     format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s"
 )
 
-
+# 获取URL对应的内容。Http Response!
 def get_url(url):
     try:
+        # http请求url
         f = urllib.urlopen(url)
-
+        # 获取http请求响应码(200,400,500 etc.)
         status = f.getcode()
 
         logger.info("请求url = %s, status:%s", url, status)
@@ -40,7 +42,7 @@ def get_url(url):
         if f:
             f.close()
 
-
+# 获取文章列表所在的页面地址
 def get_blog_list_url(html_string):
     _reg = r'href="(\S*)">博文目录</a>'
     _search = re.search(_reg, html_string, re.I | re.S)
@@ -48,7 +50,7 @@ def get_blog_list_url(html_string):
         logger.info("博客目录url=%s", _search.group(1))
         return _search.group(1)
 
-
+# 获取文章类表分页地址
 def get_next_page_url(html):
     _reg = r'<a href="(\S*)" title="跳转至第 \d+ 页">下一页'
     _search = re.search(_reg, html, re.I | re.S)
@@ -56,10 +58,10 @@ def get_next_page_url(html):
         logger.info("下一页url=%s", _search.group(1))
         return _search.group(1)
 
-
+# 博客信息[title, url, post, date] : [标题，链接地址，链接名，发布时间]
 _blog_list = []
 
-
+# 获取所有的博客地址信息
 def get_blog_list(html):
     _reg = r'title="(\S*)" target="_blank" href="(\S*)">(\S*)</a>.*?class="atc\_tm SG\_txtc">(\d{4,}-\d\d-\d\d \d\d:\d\d)'
 
@@ -72,8 +74,8 @@ def get_blog_list(html):
 
     logger.info("当前页博客数量=%s", len(blog_list))
 
+    # 获取下一页
     _next_url = get_next_page_url(html)
-
     if _next_url:
         get_blog_list(get_url(_next_url))
     else:
@@ -106,15 +108,15 @@ def get_blog(url):
 
     return _blog
 
-
+# 获取保存的博客文件名称
 def get_blog_filename(title, blog_date):
     return r'【%s】%s' % (blog_date, title)
 
-
+# 判断待保存博客文件是否存在
 def is_exist_blog(blog_name, path):
     return os.path.exists((path + blog_name).decode("utf-8") + '.txt')
 
-
+# 保存博客文件
 def store_blog(filename, content, path):
     try:
 
