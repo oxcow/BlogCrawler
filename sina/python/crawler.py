@@ -24,45 +24,64 @@ logger.basicConfig(
     format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s"
 )
 
-# 获取URL对应的内容。Http Response!
+
 def get_url(url):
+    """获取URL对应的内容。Http Response!
+
+    Args:
+        url: http请求地址
+
+    Returns:
+        返回页面内容
+
+    Raises:
+        IOError: http请求IO异常
+    """
     try:
-        # http请求url
-        f = urllib.urlopen(url)
-        # 获取http请求响应码(200,400,500 etc.)
-        status = f.getcode()
-
+        f = urllib.urlopen(url)  # http请求url
+        status = f.getcode()  # 获取http请求响应码(200,400,500 etc.)
         logger.info("请求url = %s, status:%s", url, status)
-
         return f.read()
-
-    except IOError, e:
-        logger.warn(e)
+    except IOError, _e:
+        logger.warn(_e)
     else:
-        if f:
-            f.close()
+        f.close if f else None
 
-# 获取文章列表所在的页面地址
-def get_blog_list_url(html_string):
+
+def get_blog_list_url(str_html):
+    """获取文章列表所在的页面地址
+
+    Args:
+        str_html: 页面HTML内容字符串
+    """
     _reg = r'href="(\S*)">博文目录</a>'
-    _search = re.search(_reg, html_string, re.I | re.S)
+    _search = re.search(_reg, str_html, re.I | re.S)
     if _search:
         logger.info("博客目录url=%s", _search.group(1))
         return _search.group(1)
 
-# 获取文章类表分页地址
+
 def get_next_page_url(html):
+    """获取文章类表分页地址
+
+    Args:
+        html: 页面HTML内容字符串
+    Returns:
+        url地址
+    """
     _reg = r'<a href="(\S*)" title="跳转至第 \d+ 页">下一页'
     _search = re.search(_reg, html, re.I | re.S)
     if _search:
         logger.info("下一页url=%s", _search.group(1))
         return _search.group(1)
 
-# 博客信息[title, url, post, date] : [标题，链接地址，链接名，发布时间]
-_blog_list = []
 
-# 获取所有的博客地址信息
+_blog_list = []  # 博客信息[title, url, post, date] : [标题，链接地址，链接名，发布时间]
+
+
 def get_blog_list(html):
+    """ 获取所有的博客地址信息
+    """
     _reg = r'title="(\S*)" target="_blank" href="(\S*)">(\S*)</a>.*?class="atc\_tm SG\_txtc">(\d{4,}-\d\d-\d\d \d\d:\d\d)'
 
     blog_list = re.findall(_reg, html, re.I | re.S)
@@ -74,12 +93,9 @@ def get_blog_list(html):
 
     logger.info("当前页博客数量=%s", len(blog_list))
 
-    # 获取下一页
-    _next_url = get_next_page_url(html)
-    if _next_url:
-        get_blog_list(get_url(_next_url))
-    else:
-        return blog_list
+    _next_url = get_next_page_url(html)  # 获取下一页
+
+    return get_blog_list(get_url(_next_url)) if _next_url else blog_list
 
 
 # html 文章内容解析类
@@ -108,29 +124,51 @@ def get_blog(url):
 
     return _blog
 
-# 获取保存的博客文件名称
+
 def get_blog_filename(title, blog_date):
+    """获取保存的博客文件名称
+    Args:
+        title: 标题
+        blog_date: 创建时间
+    Returns:
+        博客保存文件名
+    """
+
     return r'【%s】%s' % (blog_date, title)
 
-# 判断待保存博客文件是否存在
+
 def is_exist_blog(blog_name, path):
+    """判断待保存博客文件是否存在
+
+    Args：
+        blog_name: 博客文件名
+        path: 所在路径
+    Returns:
+        存在返回True，否则返回False
+    """
+
     return os.path.exists((path + blog_name).decode("utf-8") + '.txt')
 
-# 保存博客文件
-def store_blog(filename, content, path):
-    try:
 
+def store_blog(filename, content, path):
+    """保存博客文件
+
+    Args:
+        filename: 文件名
+        content: 文件内容
+        path: 保存路径
+
+    Raises:
+        IOError: 读写文件异常
+    """
+    try:
         f = file((path + filename).decode("utf-8") + '.txt', 'wb+')
         f.write(content.strip())
         f.flush()
-
-    except IOError, e:
-
-        logger.error(e)
-
+    except IOError, _e:
+        logger.error(_e)
     else:
-        if f:
-            f.close()
+        f.close() if f else None
 
 
 if __name__ == '__main__':
@@ -190,5 +228,5 @@ if __name__ == '__main__':
 
     _end = time.time()
 
-    print("博客总数量：%d，实际保存 %d，共耗时 %ss" % ( len(_blog_list), nums, round(_end - _start, 3)))
+    print("博客总数量：%d，实际保存 %d，共耗时 %ss" % (len(_blog_list), nums, round(_end - _start, 3)))
 
